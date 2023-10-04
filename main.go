@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	instana "github.com/instana/go-sensor"
 	"github.com/instana/go-sensor/instrumentation/instafiber"
@@ -34,6 +37,35 @@ func main() {
 			return c.SendString(err.Error())
 		}
 		return c.SendString("Hello world!")
+	}))
+
+	app.Get("/login", instafiber.TraceHandler(sensor, "login", "/login", func(ctx *fiber.Ctx) error {
+		jsonStr := []byte(`{"email": "jamet@kudasi.com", "password": "kolorijo123"}`)
+		// Create a new HTTP request with the JSON body
+		req, err := http.NewRequest("POST", "http://119.81.37.230:1323/login", bytes.NewBuffer(jsonStr))
+		if err != nil {
+			fmt.Println("Error creating request:", err)
+			return err
+		}
+
+		// Set the request headers
+		req.Header.Set("Content-Type", "application/json")
+
+		// Create an HTTP client and send the request
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println("Error sending request:", err)
+			return err
+		}
+		defer resp.Body.Close()
+
+		result := map[string]interface{}{}
+		err = json.NewDecoder(resp.Body).Decode(&result)
+		if err != nil {
+			return err
+		}
+		return ctx.JSON(result)
 	}))
 
 	// Define a route handler for the root path "/"
