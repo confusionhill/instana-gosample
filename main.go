@@ -5,6 +5,7 @@ import (
 	instana "github.com/instana/go-sensor"
 	"github.com/instana/go-sensor/instrumentation/instafiber"
 	"github.com/sirupsen/logrus"
+	"net/http"
 	"os"
 )
 
@@ -28,6 +29,10 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/greet", instafiber.TraceHandler(sensor, "greet", "/greet", func(c *fiber.Ctx) error {
+		_, err := http.Get("http://119.81.37.230:1323/place/something")
+		if err != nil {
+			return c.SendString(err.Error())
+		}
 		return c.SendString("Hello world!")
 	}))
 
@@ -43,7 +48,7 @@ func main() {
 	})
 
 	// Start the Fiber application on port 3000
-	err := app.Listen(":3000")
+	err := app.Listen(":3001")
 	if err != nil {
 		panic(err)
 	}
