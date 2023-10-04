@@ -32,6 +32,11 @@ func main() {
 		return c.SendString("Hello, Fiber!")
 	})
 
+	app.Get("/hello", func(ctx *fiber.Ctx) error {
+		logger.Error("hacker mana lagi nih?")
+		return ctx.SendString("Emg boleh begitu?")
+	})
+
 	// Start the Fiber application on port 3000
 	err := app.Listen(":3000")
 	if err != nil {
