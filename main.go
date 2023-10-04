@@ -3,17 +3,16 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	instana "github.com/instana/go-sensor"
+	"github.com/instana/go-sensor/instrumentation/instafiber"
 	"github.com/sirupsen/logrus"
 	"os"
 )
 
 func main() {
-	app := fiber.New()
-
 	opt := *instana.DefaultOptions()
 	opt.Service = "example-golang-fiber-instana"
 	opt.EnableAutoProfile = true
-	instana.StartMetrics(&opt)
+	sensor := instana.NewSensorWithTracer(instana.NewTracerWithOptions(&opt))
 	// initialize and configure the logger
 	logger := logrus.New()
 	logger.Level = logrus.InfoLevel
@@ -25,6 +24,12 @@ func main() {
 
 	// use logrus to log the Instana Go Collector messages
 	instana.SetLogger(logger)
+
+	app := fiber.New()
+
+	app.Get("/greet", instafiber.TraceHandler(sensor, "greet", "/greet", func(c *fiber.Ctx) error {
+		return c.SendString("Hello world!")
+	}))
 
 	// Define a route handler for the root path "/"
 	app.Get("/", func(c *fiber.Ctx) error {

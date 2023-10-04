@@ -7,6 +7,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.49.2 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/instana/go-sensor v1.57.0 // indirect
+	github.com/instana/go-sensor/instrumentation/instafiber v0.5.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/looplab/fsm v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
